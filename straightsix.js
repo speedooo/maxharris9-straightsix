@@ -1,43 +1,6 @@
-// inspired by https://speakerdeck.com/vjeux/react-css-in-js
-//
-// XXX: right now, if you attempt to use an unknown property, it'll just substitute undefined, and no warning will be triggered
-//   e.g., fontWeight: css.gold => font-weight: undefined
-// when support for es6 proxy (which, among other things, allow you to specify get and set handlers) lands in desktop browsers,
-// it will be easy to  will be easy to fix! until then, here are your alternatives:
-//
-// just jam in the string you want to see in the DOM:
-//   e.g., fontWeight: 'gold'
-// pro: works okay, good to have this around as a last resort
-// con: no error checking
-//
-// implement clunky getters (which is worse than just using the string)
-//   e.g., fontWeight: css.get('gold')
-// pro: error checking
-// con: too much typing
-//
-// implement each constant as a method
-//   e.g., fontWeight: css.gold()
-// pro: error checking
-// con: parens are still noise
-//
-// XXX: CSS parser?
-//   var style = css.parse('someExistingCss');
-
 css = {};
 
-// XXX: put this in a nicer place
-var specialCases = new HashMap1d();
-specialCases.addItem('webkitUserSelect', '-webkit-user-select');
-specialCases.addItem('msUserSelect', '-ms-user-select');
-specialCases.addItem('mozUserSelect', '-moz-user-select');
-specialCases.addItem('oUserSelect', '-o-user-select');
-specialCases.addItem('webkitTransition', '-webkit-transition');
-specialCases.addItem('mozTransition', '-moz-transition');
-
-specialCases.addItem('webkitMarginBefore', '-webkit-margin-before');
-specialCases.addItem('webkitMarginAfter', '-webkit-margin-after');
-specialCases.addItem('webkitMarginStart', '-webkit-margin-start');
-specialCases.addItem('webkitMarginEnd', '-webkit-margin-end');
+var specialCases = getSpecialCases();
 
 css.styleString = function (styleObject) {
   var result = '';
@@ -69,9 +32,43 @@ css.styleString = function (styleObject) {
   return result;
 }
 
-css.merge = function (baseObject, newObject) {
-  return _.extend({ }, baseObject, newObject);
+// XXX: polyfill just lazily grabbed up, without tests, from https://github.com/sindresorhus/object-assign
+function ToObject(val) {
+  if (val == null) {
+    throw new TypeError('Object.assign cannot be called with null or undefined');
+  }
+
+  return Object(val);
 }
+
+var objectAssign = Object.assign || function (target, source) {
+  var from;
+  var keys;
+  var to = ToObject(target);
+
+  for (var s = 1; s < arguments.length; s++) {
+    from = arguments[s];
+    keys = Object.keys(Object(from));
+
+    for (var i = 0; i < keys.length; i++) {
+      to[keys[i]] = from[keys[i]];
+    }
+  }
+
+  return to;
+};
+// XXX: end lifted polyfill
+
+// lifted almost verbatim from Christopher Chedeau's presentation
+css.merge = function () {
+  var res = {};
+  for (var i = 0; i < arguments.length; ++i) {
+    if (arguments[i]) {
+      objectAssign(res, arguments[i]);
+    }
+  }
+  return res;
+};
 
 clamp = function (number, min, max) {
   return Math.min(Math.max(number, min), max);
