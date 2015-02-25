@@ -5,7 +5,9 @@ This package attempts to facilitate expressing CSS in JavaScript. Inspired by ht
 This is an experiment - one of the goals here is to figure out if this is a really good idea or not.
 
 XXX: right now, if you attempt to use an unknown property, it'll just substitute undefined, and no warning will be triggered
-  e.g., fontWeight: css.gold => font-weight: undefined
+
+    e.g., fontWeight: css.gold => font-weight: undefined
+
 when support for es6 proxy (which, among other things, allow you to specify get and set handlers) lands in desktop browsers,
 it will be easy to fix! until then, here are your alternatives:
 
