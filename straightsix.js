@@ -30,16 +30,16 @@ css.styleString = function (styleObject) {
   }
 
   return result;
-}
+};
 
-// XXX: polyfill just lazily grabbed up, without tests, from https://github.com/sindresorhus/object-assign
+// XXX: 'ponyfill' just lazily grabbed up, without tests, from https://github.com/sindresorhus/object-assign
 function ToObject(val) {
   if (val == null) {
     throw new TypeError('Object.assign cannot be called with null or undefined');
   }
 
   return Object(val);
-}
+};
 
 var objectAssign = Object.assign || function (target, source) {
   var from;
@@ -72,8 +72,4 @@ css.merge = function () {
 
 clamp = function (number, min, max) {
   return Math.min(Math.max(number, min), max);
-};
-
-camelCaseToHyphenated = function (camelCasedString) {
-  return camelCasedString.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(); // XXX: replace with something less expensive
 };
